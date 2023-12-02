@@ -27,7 +27,7 @@ exports.protect = asyncErrorHandler(async (req, res, next) => {
 
   if (tokenInDb && tokenInDb.user_id.toString() !== decoded.id) {
     res.clearCookie('jwt');
-    return next(new CustomError('User'));
+    return next(new CustomError('User not found', 401));
   }
 
   //if the user exits

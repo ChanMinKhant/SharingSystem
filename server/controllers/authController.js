@@ -267,6 +267,9 @@ exports.changePassword = asyncErrorHandler(async (req, res, next) => {
   if (!req.user)
     return next(new CustomError('Please login to change password', 401));
   const { currentPassword, newPassword, confirmPassword } = req.body;
+  if (!currentPassword && !newPassword && !confirmPassword) {
+    const err = new CustomError('Please provide all fields', 400);
+  }
   if (!currentPassword) {
     const err = new CustomError('Please provide current password', 400);
     return next(err);

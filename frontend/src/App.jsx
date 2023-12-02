@@ -10,7 +10,7 @@ import {
 } from './pages/auth/index';
 import { FileUploadPage } from './pages/file/index';
 import { Url, RedirectPage } from './pages/url/index';
-import { Host } from './pages/host/index';
+import { Host, ViewHost } from './pages/host/index';
 
 function App() {
   return (
@@ -29,6 +29,7 @@ function App() {
         <Route path='/url' element={<Url />} />
         <Route path='/url/:shortUrl' element={<RedirectPage />} />
         <Route path='/host' element={<Host />} />
+        <Route path='/' element={<ViewHost />} />
       </Routes>
     </Router>
   );

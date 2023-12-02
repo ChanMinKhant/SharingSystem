@@ -17,6 +17,10 @@ const HostingSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    views: {
+      type: Number,
+      default: 0,
+    },
     hostingType: {
       type: String,
       enum: ['free', 'premium'],

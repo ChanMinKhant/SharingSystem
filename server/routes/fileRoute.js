@@ -17,7 +17,7 @@ const {
 
 router.use(verifyJWT);
 router.route('/upload').post(singleUpload('file'), uploadFile);
-router.use(protect);
+// router.use(protect);
 router.route('/').get(getAllFiles);
 router.route('/:shortId').patch(updateFile).delete(deleteFile);
 

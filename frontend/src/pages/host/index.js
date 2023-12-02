@@ -1,3 +1,3 @@
 import Host from './Host';
-
-export { Host };
+import ViewHost from './ViewHost';
+export { Host, ViewHost };
