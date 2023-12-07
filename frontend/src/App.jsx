@@ -8,7 +8,7 @@ import {
   ResetPassword,
   ChangePassword,
 } from './pages/auth/index';
-import { FileUploadPage } from './pages/file/index';
+import { FileDownloadPage, FileUploadPage } from './pages/file/index';
 import { Url, RedirectPage } from './pages/url/index';
 import { Host, ViewHost } from './pages/host/index';
 
@@ -30,6 +30,7 @@ function App() {
         <Route path='/url/:shortUrl' element={<RedirectPage />} />
         <Route path='/host' element={<Host />} />
         <Route path='/' element={<ViewHost />} />
+        <Route path='/files/:shortId' element={<FileDownloadPage />} />
       </Routes>
     </Router>
   );

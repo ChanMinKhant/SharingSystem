@@ -7,7 +7,13 @@ const User = require('../models/userModel');
 const ApiFeactures = require('../utils/ApiFeactures');
 
 exports.createShortenUrl = asyncErrorHandler(async (req, res, next) => {
-  const { url, customLink, password = undefined, limit } = req.body;
+  const {
+    url,
+    customLink,
+    password = undefined,
+    limit,
+    isActive = true,
+  } = req.body;
   if (
     !url ||
     !(
@@ -61,7 +67,6 @@ exports.createShortenUrl = asyncErrorHandler(async (req, res, next) => {
   const shortUrl = generateRandomString(process.env.URL_LENGTH);
   // const user = req.user ? req.user._id : null; // or undefined
   const user_id = req.user?._id;
-  console.log(shortUrl);
 
   const newUrl = await Url.create({
     url,
@@ -69,6 +74,7 @@ exports.createShortenUrl = asyncErrorHandler(async (req, res, next) => {
     user_id,
     password,
     limit: limit || 1000,
+    isActive,
   });
   // const shortenedUrl = `${req.protocol}://${req.get('host')}/url/${shortUrl}`;
   // console.log(shortenedUrl);
@@ -81,9 +87,6 @@ exports.createShortenUrl = asyncErrorHandler(async (req, res, next) => {
 
 // i have to solve if i wont use customLink and if use add customLink i will store also in shortUrl
 exports.getAllUrls = asyncErrorHandler(async (req, res, next) => {
-  // console.log('here');
-  // req.user = user; //for testing
-
   if (!req.user) {
     const err = new CustomError(
       'only login user can see the generated url',
@@ -141,14 +144,14 @@ exports.getUrl = asyncErrorHandler(async (req, res, next) => {
   }
 
   if (url.limit <= 0) {
-    const err = new CustomError('This short url is expired', 400);
+    const err = new CustomError('This short url already expired', 400);
     return next(err);
   }
 
   if (url.password) {
     //if url contain password, need to render password page
     if (!password) {
-      const err = new CustomError('Please enter password', 400);
+      const err = new CustomError('Password required', 400);
       return next(err);
     } // i think it is not necessary
     if (url.password !== password) {
@@ -156,7 +159,6 @@ exports.getUrl = asyncErrorHandler(async (req, res, next) => {
       return next(err);
     }
   }
-  // console.log('here');
   let redirectUrl = url.url;
   if (
     !redirectUrl.startsWith('http://') &&

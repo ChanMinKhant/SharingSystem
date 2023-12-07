@@ -53,7 +53,6 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (environment === 'development') {
-    console.log('error is here', err);
     devError(err, res);
   } else if (environment === 'production') {
     console.log('error is here');

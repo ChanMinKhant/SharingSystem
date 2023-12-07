@@ -18,7 +18,7 @@ const EmailVerificationPage = () => {
   };
   useEffect(() => {
     verify();
-  }, [token]);
+  }, []);
 
   return (
     <div>

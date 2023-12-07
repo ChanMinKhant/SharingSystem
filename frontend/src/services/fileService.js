@@ -11,6 +11,27 @@ const uploadFile = async (formData) => {
   }
 };
 
+const getFile = async (shortId) => {
+  try {
+    const response = await apiService.get(`${fileBaseUrl}/${shortId}`);
+    return response; // i removed data because i want to check also header
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getOriginalFilename = async (shortId) => {
+  try {
+    // write code
+    const response = await apiService.get(
+      `${fileBaseUrl}/orignalName/${shortId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const getAllFiles = async () => {
   try {
     const response = await apiService.get(`${fileBaseUrl}`);
@@ -38,4 +59,11 @@ const deleteFile = async (shortId) => {
   }
 };
 
-export { uploadFile, getAllFiles, updateFile, deleteFile };
+export {
+  uploadFile,
+  getFile,
+  getOriginalFilename,
+  getAllFiles,
+  updateFile,
+  deleteFile,
+};

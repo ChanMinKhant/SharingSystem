@@ -21,7 +21,9 @@ const ShortenUrlApp = () => {
         customLink: customLink || undefined,
         password: password || undefined,
         limit: limit || undefined,
+        isActive,
       };
+      console.log(data);
       const response = await createShortenUrl(data);
       setShortenedUrl(response.data.shortUrl);
 
@@ -57,7 +59,7 @@ const ShortenUrlApp = () => {
   const handleIsActiveChange = () => {
     setisActive(!isActive);
   };
-
+  console.log(isActive);
   return (
     <div>
       <h1>Shorten URL App</h1>

@@ -6,14 +6,14 @@ const path = require('path');
 
 // Upload File @ POST /file/upload
 exports.uploadFile = asyncErrorHandler(async (req, res, next) => {
+  console.log(req.file);
   const { customLink, password, limit, customFileName } = req.body;
   const user_id = req.user?._id || undefined;
   const originalFilename = customFileName
     ? `${customFileName}${path.extname(req.file?.originalname)}`
     : req.file?.originalname;
-  const filename = req.file?.filename;
+  const filename = req.uniqueFilename;
   const fileSize = req.file?.size || 0;
-
   if (customLink || password || limit) {
     if (!req.user?.isPremium) {
       const err = new CustomError(
@@ -49,8 +49,17 @@ exports.uploadFile = asyncErrorHandler(async (req, res, next) => {
       }
     }
   }
-
-  const file = {
+  // const file = {
+  //   shortId: customLink || generateRandomString(),
+  //   originalFilename,
+  //   filename,
+  //   user_id,
+  //   fileSize,
+  //   password: password || undefined,
+  //   limit: limit || undefined,
+  // };
+  // Save file to the database
+  const file = await File.create({
     shortId: customLink || generateRandomString(),
     originalFilename,
     filename,
@@ -58,10 +67,79 @@ exports.uploadFile = asyncErrorHandler(async (req, res, next) => {
     fileSize,
     password: password || undefined,
     limit: limit || undefined,
-  };
-  // Save file to the database
-  await File.create(file);
-  res.status(200).json({ message: 'File uploaded successfully.' });
+  });
+  res.status(200).json({ message: 'File uploaded successfully.', data: file });
+});
+
+// Get File @ GET /file/:id
+exports.getFile = asyncErrorHandler(async (req, res, next) => {
+  const { shortId } = req.params;
+  const { password } = req.body;
+
+  // search file in database
+  const file = await File.findOne({ shortId }).populate('user_id', 'filePath');
+  if (!file) {
+    const err = new CustomError('File not found', 404);
+    return next(err);
+  }
+
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="${encodeURIComponent(file.originalFilename)}"`
+  );
+  //check if file is active or not
+  if (!file.isActive) {
+    console.log(file.isActive);
+    const err = new CustomError('File is not active', 400);
+    return next(err);
+  }
+  //check if the file limit is over or not
+  if (file.limit) {
+    if (file.limit <= 0) {
+      const err = new CustomError('File limit is over', 400);
+      return next(err);
+    }
+  }
+  //check if file is password protected or not
+  if (file.password) {
+    if (!req.body.password) {
+      const err = new CustomError('Password is required', 400);
+      return next(err);
+    }
+    if (req.body.password !== file.password) {
+      const err = new CustomError('Password is incorrect', 400);
+      return next(err);
+    }
+  }
+  // i need to know the uploader of the file so that i can check the path of the file
+  const filePath = path.join(
+    __dirname,
+    '..',
+    'uploads',
+    'file',
+    file.user_id || 'allfiles',
+    file.filename
+  );
+
+  const filename = file.originalFilename;
+  console.log(filename);
+  res.download(filePath, file.originalFilename, async (err) => {
+    if (err) {
+      const error = new CustomError('File not found', 404);
+      return next(error);
+    }
+  });
+});
+
+exports.getOriginalFilename = asyncErrorHandler(async (req, res, next) => {
+  const { shortId } = req.params;
+  console.log(shortId);
+  const file = await File.findOne({ shortId });
+  if (!file) {
+    const err = new CustomError('File not found', 404);
+    return next(err);
+  }
+  res.status(200).json({ message: 'success', data: file.originalFilename });
 });
 
 // Get All Files @ GET /file

@@ -3,8 +3,8 @@ const CustomError = require('../utils/CustomError');
 const path = require('path');
 const fs = require('fs');
 
-const storage = (customPath, manualPath, useOriginalName) =>
-  multer.diskStorage({
+const storage = (customPath, manualPath, useOriginalName) => {
+  return multer.diskStorage({
     destination: function (req, file, cb) {
       const userFilePath = req.user?.filePat || 'allFiles';
       const dest = path.resolve(
@@ -15,7 +15,7 @@ const storage = (customPath, manualPath, useOriginalName) =>
         userFilePath,
         manualPath ? manualPath : ''
       );
-
+      console.log(dest);
       if (!fs.existsSync(dest)) {
         // Create folder if it doesn't exist
         fs.mkdirSync(dest, { recursive: true });
@@ -27,6 +27,7 @@ const storage = (customPath, manualPath, useOriginalName) =>
         const originalName = file.originalname;
         const uniqueFilename = `${originalName}`;
         req.uniqueFilename = uniqueFilename;
+        console.log(req.uniqueFilename);
         return cb(null, uniqueFilename);
       } else {
         const timestamp = Date.now();
@@ -34,10 +35,12 @@ const storage = (customPath, manualPath, useOriginalName) =>
         const extension = originalName.substring(originalName.lastIndexOf('.'));
         const uniqueFilename = `${timestamp}-${originalName}`;
         req.uniqueFilename = uniqueFilename;
+        console.log(req.uniqueFilename);
         cb(null, uniqueFilename);
       }
     },
   });
+};
 
 const limits = (req) => {
   const nonPremiumMB = process.env.NON_PREMIUM_MB || 20;
@@ -105,7 +108,7 @@ exports.singleUpload =
       res,
       (err) => {
         if (err) errorChecker(err, next);
-        // else next();
+        else next();
       }
     );
   };

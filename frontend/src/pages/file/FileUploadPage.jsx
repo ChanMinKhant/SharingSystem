@@ -48,29 +48,32 @@ const FileUploadPage = () => {
     formData.append('customFileName', customFileName);
 
     try {
-      await uploadFile(formData);
+      console.log('here1');
+      const response = await uploadFile(formData);
+      console.log('response.data');
       setUploadMessage('File uploaded successfully.');
-      const updatedFiles = await getAllFiles();
-      setFiles(updatedFiles.data);
+      setFiles([...files, response?.data]);
+      console.log(files);
+      console.log('first');
     } catch (error) {
-      console.error('Error uploading file:', error?.response?.data?.message);
+      console.error('Error uploading file:', error);
       setError(error?.response?.data?.message || 'Error uploading file.');
     }
   };
 
-  useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        const response = await getAllFiles();
-        setFiles(response.data);
-      } catch (error) {
-        console.error('Error fetching files:', error?.response?.data?.message);
-        setError(error?.response?.data?.message || 'Error fetching files.');
-      }
-    };
+  // useEffect(() => {
+  //   const fetchFiles = async () => {
+  //     try {
+  //       const response = await getAllFiles();
+  //       setFiles(...response.data);
+  //     } catch (error) {
+  //       console.error('Error fetching files:', error?.response?.data?.message);
+  //       setError(error?.response?.data?.message || 'Error fetching files.');
+  //     }
+  //   };
 
-    fetchFiles();
-  }, []);
+  //   fetchFiles();
+  // }, []);
 
   return (
     <div>
@@ -106,11 +109,13 @@ const FileUploadPage = () => {
         {uploadMessage && <p style={{ color: 'green' }}>{uploadMessage}</p>}
       </form>
       <h2>Uploaded Files</h2>
-      <ul>
-        {files?.map((file) => (
+
+      {files?.map((file) => (
+        <ul>
           <li key={file._id}>{file.originalFilename}</li>
-        ))}
-      </ul>
+          <li>{file.shortId}</li>
+        </ul>
+      ))}
     </div>
   );
 };
